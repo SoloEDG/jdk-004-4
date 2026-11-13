@@ -8,6 +8,91 @@ export interface Player extends Vec {
   radius: number;
   invincible: number;
 }
+export type CoverKind = "cover" | "obstacle";
+/** Axis-aligned field geometry. `x`/`y` are the top-left corner. */
+export interface Cover extends Vec {
+  id: number;
+  kind: CoverKind;
+  w: number;
+  h: number;
+  hp: number;
+  maxHp: number;
+}
+export interface NavPatch {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  cells: number;
+}
+/**
+ * Passability grid used by enemy routing, drop placement and spawn checks.
+ * It is rebuilt once per field and afterwards patched only inside the cells
+ * touched by an edit or a destroyed cover.
+ */
+export interface NavState {
+  cell: number;
+  cols: number;
+  rows: number;
+  blocked: Uint8Array;
+  fullBuilds: number;
+  localPatches: number;
+  pathSearches: number;
+  lastPatch: NavPatch | null;
+}
+/** Which covers the renderer should shade; replaced atomically with a field edit. */
+export interface OcclusionState {
+  revision: number;
+  visibleIds: number[];
+}
+export interface FieldState {
+  covers: Cover[];
+  nextCoverId: number;
+  revision: number;
+  nav: NavState;
+  occlusion: OcclusionState;
+  acceptedEdits: number;
+  /** Shared pending preview: combat collision and spawn checks both read it. */
+  pending: FieldPreview | null;
+  /** Re-based once per simulation step so the preview never goes stale. */
+  pendingEdit: FieldEdit | null;
+}
+export interface FieldEdit {
+  kind?: CoverKind;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  hp?: number;
+}
+export type FieldRejectReason =
+  | "out-of-bounds"
+  | "too-small"
+  | "player-overlap"
+  | "enemy-overlap"
+  | "traps-player"
+  | "too-many-covers";
+/**
+ * Result of a pure placement preview. Combat collision and wave spawn checks
+ * share the same prospective geometry instead of re-deriving it per system.
+ */
+export interface FieldPreview {
+  ok: boolean;
+  reason: FieldRejectReason | null;
+  kind: CoverKind;
+  rect: { x: number; y: number; w: number; h: number };
+  lockedCells: number;
+  reachableCells: number;
+  /** Nav cells that would flip state; shared by collision and spawn validation. */
+  changedCells: number[];
+}
+export interface EnemyRoute {
+  revision: number;
+  goal: Vec;
+  index: number;
+  expires: number;
+  points: Vec[];
+}
 export interface Enemy extends Vec {
   id: number;
   kind: "chaser" | "shooter" | "elite";
@@ -15,6 +100,7 @@ export interface Enemy extends Vec {
   maxHp: number;
   radius: number;
   cooldown: number;
+  route?: EnemyRoute;
 }
 export interface Bullet extends Vec {
   id: number;
@@ -88,6 +174,7 @@ export interface GameDoc {
   records: RunRecord[];
   notice: string;
   victory: boolean;
+  field: FieldState;
 }
 export interface Input {
   x: number;
@@ -106,6 +193,7 @@ export interface FrameEvents {
   taken: number;
   shots: number;
   collected: number;
+  brokenCovers: Cover[];
 }
 export const WIDTH = 1000;
 export const HEIGHT = 650;

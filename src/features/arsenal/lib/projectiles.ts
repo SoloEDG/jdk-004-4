@@ -1,4 +1,6 @@
 import type { GameDoc, WeaponId, Vec } from "../../../shared/types";
+import { blockedByPreview } from "../../field/lib/placement";
+
 export function fire(
   doc: GameDoc,
   weapon: WeaponId,
@@ -7,7 +9,8 @@ export function fire(
   speed: number,
   pierce: number,
   origin: Vec = doc.player,
-): void {
+): boolean {
+  if (blockedByPreview(doc, origin, weapon === "nova" ? 6 : 4)) return false;
   doc.bullets.push({
     id: doc.nextId++,
     x: origin.x,
@@ -22,6 +25,7 @@ export function fire(
     pierce,
     hit: [],
   });
+  return true;
 }
 export function nearestTarget(doc: GameDoc): Vec | undefined {
   let best: Vec | undefined,

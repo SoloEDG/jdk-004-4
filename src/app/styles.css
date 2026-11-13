@@ -992,3 +992,121 @@ footer .mono {
     font-size: 24px;
   }
 }
+.field-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 30px;
+  padding: 0 15px;
+  border-top: 1px solid #26343d;
+  background: #101c20;
+  font-size: 9px;
+  color: #7d99a0;
+  overflow: hidden;
+}
+.field-toolbar span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.field-toolbar button {
+  font-size: 9px;
+  padding: 3px 8px;
+  border: 1px solid #34414b;
+  border-radius: 3px;
+  color: #8ea3ad;
+  white-space: nowrap;
+}
+.field-toolbar button.active {
+  border-color: #7fd8c0;
+  color: #b6f4e0;
+  background: #14312c;
+}
+.field-panel {
+  margin-top: 0;
+}
+.field-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 12px 0;
+}
+.field-presets button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid #2b3a42;
+  border-radius: 5px;
+  background: #101a20;
+  text-align: left;
+  font-size: 10px;
+  color: #9db2b8;
+}
+.field-presets button.active {
+  border-color: #6fd3bf;
+  background: #122a27;
+  color: #c8f5e8;
+}
+.field-presets button.obstacle.active {
+  border-color: #a68ae0;
+  background: #1c1730;
+  color: #d8ccff;
+}
+.field-presets button span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+.field-presets button small {
+  font-size: 8px;
+  color: #6c808a;
+}
+.field-presets button i {
+  display: block;
+  border: 1px solid #6fd3bf55;
+  background: #6fd3bf22;
+  flex: none;
+}
+.field-presets button.obstacle i {
+  border-color: #a68ae088;
+  background: #a68ae02a;
+}
+.field-preview {
+  min-height: 54px;
+  border: 1px dashed #33454c;
+  border-radius: 5px;
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #0d171c;
+}
+.field-preview strong {
+  font-size: 10px;
+  color: #9fb4ba;
+  font-weight: 600;
+}
+.field-preview span {
+  font-size: 9px;
+  color: #708691;
+  line-height: 1.5;
+}
+.field-preview.ok {
+  border-color: #5fbfa8;
+}
+.field-preview.ok strong {
+  color: #aff7e2;
+}
+.field-preview.bad {
+  border-color: #bd5f6e;
+}
+.field-preview.bad strong {
+  color: #ffa5b2;
+}
+.field-stats {
+  margin-top: 8px;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: #5d737c;
+}

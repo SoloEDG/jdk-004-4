@@ -19,9 +19,12 @@ import { UpgradeDialog, ExperienceBar } from "../features/progression";
 import { StatsPanel, ResultDialog, HistoryPanel } from "../features/results";
 import { formatTime } from "../shared/math";
 import { useAudio } from "./useAudio";
+import { useField } from "./useField";
+import { FieldPanel } from "../features/field";
 export function App() {
   const { game, input, start, toggle, choose, restart } = useGame();
   const d = game.current;
+  const editor = useField(game);
   const [history, setHistory] = useState(false);
   const [help, setHelp] = useState(false);
   const { muted, setMuted } = useAudio(d);
@@ -150,7 +153,16 @@ export function App() {
               </div>
             </div>
             <div className="canvas-wrap">
-              <Battlefield doc={d} input={input} />
+              <Battlefield
+                doc={d}
+                input={input}
+                preset={editor.preset}
+                preview={editor.placing ? editor.preview : null}
+                placing={editor.placing}
+                onPreviewAt={editor.previewAt}
+                onPlace={editor.place}
+                showNav={editor.showNav}
+              />
               <div className="sector-tag">
                 SECTOR 07<span>∞ DEEP SPACE</span>
               </div>
@@ -193,6 +205,21 @@ export function App() {
                 <ResultDialog doc={d} restart={restart} />
               )}
             </div>
+            <div className="field-toolbar">
+              <button
+                className={editor.placing ? "active" : ""}
+                onClick={editor.togglePlacing}
+              >
+                {editor.placing ? "退出编辑" : "开始编辑"}
+              </button>
+              <button
+                className={editor.showNav ? "active" : ""}
+                onClick={() => editor.setShowNav(!editor.showNav)}
+              >
+                导航网格
+              </button>
+              <span>{editor.notice ?? "场地编辑就绪"}</span>
+            </div>
             <ExperienceBar doc={d} />
             <div className="battle-footer">
               <span>
@@ -211,6 +238,12 @@ export function App() {
           </section>
           <aside className="right-sidebar">
             <ArsenalPanel doc={d} />
+            <FieldPanel
+              doc={d}
+              preset={editor.preset}
+              preview={editor.placing ? editor.preview : null}
+              onPreset={editor.pickPreset}
+            />
             <StatsPanel doc={d} />
             <div className="tip">
               <span>生存提示 / 01</span>

@@ -1,6 +1,7 @@
 import type { GameDoc, RunRecord } from "./types";
+import { createField } from "../features/field/model/fieldState";
 export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
-  return {
+  const doc: GameDoc = {
     version: 1,
     seed,
     initialSeed: seed,
@@ -39,5 +40,8 @@ export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
     records,
     notice: "等待接入战场",
     victory: false,
+    field: null as unknown as GameDoc["field"],
   };
+  doc.field = createField();
+  return doc;
 }

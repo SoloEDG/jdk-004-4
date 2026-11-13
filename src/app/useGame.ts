@@ -48,20 +48,36 @@ export function useGame() {
     };
     raf = requestAnimationFrame(tick);
     const pause = () => {
-      if (game.current.phase === "playing") game.current.phase = "paused";
+      const d = game.current;
+      if (d.phase === "playing") {
+        d.phase = "paused";
+        d.field.pending = null;
+        d.field.pendingEdit = null;
+      }
       keys.current.clear();
       input.current.firing = false;
     };
     const down = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement).tagName === "INPUT") return;
+      // Focused editor controls keep native Enter/Space activation; movement
+      // and pause shortcuts must not steal those keystrokes.
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.closest("button") &&
+        (e.key === "Enter" || e.key === " ")
+      )
+        return;
       const k = e.key.toLowerCase();
       if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(k))
         e.preventDefault();
       keys.current.add(k);
       if ((k === "escape" || k === "p") && !e.repeat) {
         const d = game.current;
-        if (d.phase === "playing") d.phase = "paused";
-        else if (d.phase === "paused") d.phase = "playing";
+        if (d.phase === "playing") {
+          d.phase = "paused";
+          d.field.pending = null;
+          d.field.pendingEdit = null;
+        } else if (d.phase === "paused") d.phase = "playing";
       }
     };
     const up = (e: KeyboardEvent) => keys.current.delete(e.key.toLowerCase());
@@ -88,8 +104,12 @@ export function useGame() {
     },
     toggle: () => {
       const d = game.current;
-      if (d.phase === "playing") d.phase = "paused";
-      else if (d.phase === "paused") d.phase = "playing";
+      if (d.phase === "playing") {
+        d.phase = "paused";
+        // A frozen battlefield must not keep a live placement ghost around.
+        d.field.pending = null;
+        d.field.pendingEdit = null;
+      } else if (d.phase === "paused") d.phase = "playing";
     },
     choose: (id: string) => chooseUpgrade(game.current, id),
     restart: () => {
